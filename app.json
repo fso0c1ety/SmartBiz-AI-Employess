@@ -23,7 +23,10 @@
       },
       "package": "com.smartbiz.aiemployees",
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -31,6 +34,12 @@
     "plugins": [
       "expo-image-picker",
       "expo-document-picker"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "5aed0401-5728-48a0-abc4-4c436583ecc2"
+      }
+    },
+    "owner": "codeplite"
   }
 }
