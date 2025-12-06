@@ -1,0 +1,55 @@
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { useAuthStore } from '../store/useAuthStore';
+import { RootStackParamList } from './types';
+
+// Screens
+import { WelcomeScreen } from '../screens/WelcomeScreen';
+import { LoginScreen } from '../screens/LoginScreen';
+import { RegisterScreen } from '../screens/RegisterScreen';
+import { ForgotPasswordScreen } from '../screens/ForgotPasswordScreen';
+import { HomeScreen } from '../screens/HomeScreen';
+import { CreateAgentScreen } from '../screens/CreateAgentScreen';
+import { AgentWorkspaceScreen } from '../screens/AgentWorkspaceScreen';
+import { ContentGeneratorScreen } from '../screens/ContentGeneratorScreen';
+import { SettingsScreen } from '../screens/SettingsScreen';
+
+const Stack = createStackNavigator<RootStackParamList>();
+
+export const AppNavigator = () => {
+  const { isAuthenticated } = useAuthStore();
+
+  return (
+    <NavigationContainer>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+          cardStyle: { backgroundColor: 'transparent' },
+          cardStyleInterpolator: ({ current }: any) => ({
+            cardStyle: {
+              opacity: current.progress,
+            },
+          }),
+        }}
+      >
+        {!isAuthenticated ? (
+          <>
+            <Stack.Screen name="Welcome" component={WelcomeScreen} />
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Register" component={RegisterScreen} />
+            <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+          </>
+        ) : (
+          <>
+            <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Screen name="CreateAgent" component={CreateAgentScreen} />
+            <Stack.Screen name="AgentWorkspace" component={AgentWorkspaceScreen} />
+            <Stack.Screen name="ContentGenerator" component={ContentGeneratorScreen} />
+            <Stack.Screen name="Settings" component={SettingsScreen} />
+          </>
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
