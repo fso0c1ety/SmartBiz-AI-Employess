@@ -23,7 +23,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: 🏗 Setup Java
         uses: actions/setup-java@v4
@@ -38,10 +37,20 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: 📦 Install dependencies
-        run: npm ci
+        run: npm install
 
-      - name: 🚀 Build APK
-        run: eas build --platform android --profile preview --non-interactive --local --output ./build/app-release.apk
+      - name: 🚀 Build APK with EAS
+        run: eas build --platform android --profile preview --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 📥 Download APK from EAS
+        run: |
+          # Get the latest build URL
+          BUILD_URL=$(eas build:list --platform android --limit 1 --json --non-interactive | jq -r '.[0].artifacts.buildUrl')
+          echo "Downloading APK from: $BUILD_URL"
+          mkdir -p ./build
+          curl -L -o ./build/app-release.apk "$BUILD_URL"
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
