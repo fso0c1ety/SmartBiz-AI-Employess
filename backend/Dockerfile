@@ -46,5 +46,5 @@ COPY --from=builder /app/node_modules ./node_modules
 # Expose port
 EXPOSE 5001
 
-# Start server (skip migrations - pooler doesn't support them)
-CMD ["npm", "start"]
+# Run migrations and start server
+CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]
