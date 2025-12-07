@@ -20,6 +20,9 @@ COPY backend/src ./src
 # Install dependencies
 RUN npm ci
 
+# Generate Prisma client in builder stage
+RUN npx prisma generate
+
 # Build TypeScript
 RUN npm run build
 
@@ -46,8 +49,9 @@ COPY --from=builder /app/dist ./dist
 # Copy Prisma schema from builder stage
 COPY --from=builder /app/prisma ./prisma
 
-# Generate Prisma client
-RUN npx prisma generate
+# Copy node_modules with generated Prisma client from builder
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
 # Expose port
 EXPOSE 5001
