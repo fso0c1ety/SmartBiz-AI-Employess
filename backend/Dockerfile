@@ -4,12 +4,12 @@ FROM node:18-alpine as builder
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
+COPY backend/package*.json ./
 
 # Copy source and prisma schema for build and client generation
-COPY tsconfig.json ./
-COPY prisma ./prisma
-COPY src ./src
+COPY backend/tsconfig.json ./
+COPY backend/prisma ./prisma
+COPY backend/src ./src
 
 # Install dependencies
 RUN npm ci
@@ -23,7 +23,7 @@ FROM node:18-alpine
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
+COPY backend/package*.json ./
 
 # Install dependencies (include Prisma for generate/migrate)
 RUN npm ci
