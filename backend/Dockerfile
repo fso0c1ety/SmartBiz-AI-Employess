@@ -3,6 +3,12 @@ FROM node:18-alpine as builder
 
 WORKDIR /app
 
+# Ensure OpenSSL available for Prisma engines
+RUN apk add --no-cache openssl1.1-compat
+
+# Hint Prisma to use musl binary
+ENV PRISMA_CLI_BINARY_TARGETS=linux-musl
+
 # Copy package files
 COPY backend/package*.json ./
 
@@ -21,6 +27,12 @@ RUN npm run build
 FROM node:18-alpine
 
 WORKDIR /app
+
+# Ensure OpenSSL available for Prisma engines
+RUN apk add --no-cache openssl1.1-compat
+
+# Hint Prisma to use musl binary
+ENV PRISMA_CLI_BINARY_TARGETS=linux-musl
 
 # Copy package files
 COPY backend/package*.json ./
