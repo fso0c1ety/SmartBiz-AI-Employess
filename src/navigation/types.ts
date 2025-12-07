@@ -3,7 +3,11 @@ export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
   ForgotPassword: undefined;
-  Main: undefined;
+  MainTabs: undefined;
+  Dashboard: undefined;
+  Agents: undefined;
+  Content: undefined;
+  Profile: undefined;
   Home: undefined;
   CreateAgent: undefined;
   AgentWorkspace: undefined;

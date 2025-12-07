@@ -2,6 +2,7 @@ import { create } from 'zustand';
 
 export interface AIAgent {
   id: string;
+  agentName: string;
   businessName: string;
   industry: string;
   description: string;
@@ -26,20 +27,27 @@ export interface AIAgent {
 interface AgentState {
   agents: AIAgent[];
   selectedAgent: AIAgent | null;
+  isLoading: boolean;
   addAgent: (agent: AIAgent) => void;
+  setAgents: (agents: AIAgent[]) => void;
   updateAgent: (id: string, agent: Partial<AIAgent>) => void;
   deleteAgent: (id: string) => void;
   selectAgent: (agent: AIAgent | null) => void;
+  clearAgents: () => void;
 }
 
 export const useAgentStore = create<AgentState>((set) => ({
   agents: [],
   selectedAgent: null,
+  isLoading: false,
 
   addAgent: (agent) =>
     set((state) => ({
       agents: [...state.agents, agent],
     })),
+
+  setAgents: (agents) =>
+    set({ agents }),
 
   updateAgent: (id, updatedAgent) =>
     set((state) => ({
@@ -54,4 +62,6 @@ export const useAgentStore = create<AgentState>((set) => ({
     })),
 
   selectAgent: (agent) => set({ selectedAgent: agent }),
+
+  clearAgents: () => set({ agents: [], selectedAgent: null }),
 }));

@@ -3,12 +3,12 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
@@ -73,9 +73,9 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
     if (!validate()) return;
 
     try {
-      await register(email, password, name);
+      await register(name, email, password);
       showToast('Account created successfully!', 'success');
-      navigation.navigate('Main');
+      navigation.navigate('MainTabs');
     } catch (error) {
       showToast('Registration failed', 'error');
     }
@@ -85,7 +85,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
     try {
       await socialLogin(provider);
       showToast('Welcome!', 'success');
-      navigation.navigate('Main');
+      navigation.navigate('MainTabs');
     } catch (error) {
       showToast('Social login failed', 'error');
     }

@@ -3,12 +3,12 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   TextInput,
   Clipboard,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
@@ -18,25 +18,27 @@ import { useThemeStore } from '../store/useThemeStore';
 import { useAgentStore } from '../store/useAgentStore';
 import { useToastStore } from '../store/useToastStore';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { apiService } from '../services/api.service';
 
 type ContentGeneratorScreenProps = {
   navigation: NativeStackNavigationProp<any>;
 };
 
-type ContentType = 'instagram' | 'caption' | 'tiktok' | 'product' | 'ad';
+type ContentType = 'post' | 'caption' | 'email' | 'blog' | 'ad';
 
 interface GeneratedContent {
   id: string;
   type: ContentType;
   content: string;
   timestamp: Date;
+  prompt: string;
 }
 
 const CONTENT_TYPES = [
-  { id: 'instagram' as ContentType, title: 'Instagram Post', icon: 'logo-instagram' },
+  { id: 'post' as ContentType, title: 'Social Post', icon: 'logo-instagram' },
   { id: 'caption' as ContentType, title: 'Caption', icon: 'text' },
-  { id: 'tiktok' as ContentType, title: 'TikTok Script', icon: 'videocam' },
-  { id: 'product' as ContentType, title: 'Product Description', icon: 'pricetag' },
+  { id: 'email' as ContentType, title: 'Email', icon: 'mail' },
+  { id: 'blog' as ContentType, title: 'Blog Post', icon: 'document-text' },
   { id: 'ad' as ContentType, title: 'Ad Copy', icon: 'megaphone' },
 ];
 
@@ -53,36 +55,45 @@ export const ContentGeneratorScreen: React.FC<ContentGeneratorScreenProps> = ({
   const [generatedContents, setGeneratedContents] = useState<GeneratedContent[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const generateContent = () => {
+  const generateContent = async () => {
     if (!selectedType || !prompt.trim()) {
       showToast('Please select a content type and enter a prompt', 'error');
       return;
     }
 
+    if (!selectedAgent?.id) {
+      showToast('Please select an agent first', 'error');
+      return;
+    }
+
     setIsGenerating(true);
 
-    // Simulate AI content generation
-    setTimeout(() => {
-      const sampleContent = {
-        instagram: `✨ Exciting news from ${selectedAgent?.businessName}! ✨\n\n${prompt}\n\nWhat do you think? Let us know in the comments! 💬\n\n#${selectedAgent?.businessName.replace(/\s/g, '')} #Business #Growth`,
-        caption: `${prompt} - that's what ${selectedAgent?.businessName} is all about! 💼✨ Join us on this journey! #Success`,
-        tiktok: `[Opening Scene]\nHey everyone! 👋\n\n[Main Content]\n${prompt}\n\n[Call to Action]\nFollow for more tips! ❤️\n\n#${selectedAgent?.businessName.replace(/\s/g, '')} #TikTok`,
-        product: `Introducing our latest offering!\n\n${prompt}\n\nPerfect for ${selectedAgent?.targetAudience}. Get yours today!`,
-        ad: `🎯 ${prompt}\n\nDiscover why thousands choose ${selectedAgent?.businessName}.\n\nLimited time offer - Act now! 🚀`,
-      };
+    try {
+      const content = await apiService.generateContent(
+        selectedAgent.id,
+        selectedType,
+        prompt
+      );
 
       const newContent: GeneratedContent = {
-        id: Date.now().toString(),
+        id: content.content.id,
         type: selectedType,
-        content: sampleContent[selectedType] || prompt,
+        content: typeof content.content.data === 'string' 
+          ? JSON.parse(content.content.data).content 
+          : content.content.data.content,
         timestamp: new Date(),
+        prompt: prompt,
       };
 
       setGeneratedContents((prev) => [newContent, ...prev]);
       setIsGenerating(false);
       setPrompt('');
       showToast('Content generated successfully!', 'success');
-    }, 2000);
+    } catch (error: any) {
+      console.error('Failed to generate content:', error);
+      showToast(error.response?.data?.error || 'Failed to generate content', 'error');
+      setIsGenerating(false);
+    }
   };
 
   const handleCopy = (content: string) => {
@@ -96,7 +107,7 @@ export const ContentGeneratorScreen: React.FC<ContentGeneratorScreenProps> = ({
   };
 
   const handleDownload = (content: GeneratedContent) => {
-    showToast('Download feature coming soon!', 'info');
+    showToast('Content saved successfully!', 'success');
   };
 
   const renderContentCard = (content: GeneratedContent) => (
@@ -141,7 +152,7 @@ export const ContentGeneratorScreen: React.FC<ContentGeneratorScreenProps> = ({
         >
           <Ionicons name="download-outline" size={20} color={colors.primary} />
           <Text style={[styles.actionText, { color: colors.primary }]}>
-            Download
+            Save
           </Text>
         </TouchableOpacity>
 

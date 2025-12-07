@@ -3,12 +3,12 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
@@ -58,7 +58,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     try {
       await login(email, password);
       showToast('Welcome back!', 'success');
-      navigation.navigate('Main');
+      navigation.navigate('MainTabs');
     } catch (error) {
       showToast('Invalid credentials', 'error');
     }
@@ -68,7 +68,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     try {
       await socialLogin(provider);
       showToast('Welcome!', 'success');
-      navigation.navigate('Main');
+      navigation.navigate('MainTabs');
     } catch (error) {
       showToast('Social login failed', 'error');
     }

@@ -1,14 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Card } from './Card';
 import { Colors } from '../constants/colors';
 import { BorderRadius, FontSize, FontWeight, Spacing } from '../constants/spacing';
 import { useThemeStore } from '../store/useThemeStore';
 
 interface MiniChartProps {
   data: number[];
-  label: string;
-  value: string;
+  label?: string;
+  value?: string;
   color?: string;
 }
 
@@ -26,11 +25,13 @@ export const MiniChart: React.FC<MiniChartProps> = ({
   const normalizedData = data.map((val) => (val / maxValue) * 100);
 
   return (
-    <Card style={styles.container}>
-      <View style={styles.header}>
-        <Text style={[styles.label, { color: colors.textSecondary }]}>{label}</Text>
-        <Text style={[styles.value, { color: colors.text }]}>{value}</Text>
-      </View>
+    <View style={styles.container}>
+      {(label || value) && (
+        <View style={styles.header}>
+          {label && <Text style={[styles.label, { color: colors.textSecondary }]}>{label}</Text>}
+          {value && <Text style={[styles.value, { color: colors.text }]}>{value}</Text>}
+        </View>
+      )}
       <View style={styles.chartContainer}>
         {normalizedData.map((height, index) => (
           <View key={index} style={styles.barContainer}>
@@ -46,7 +47,7 @@ export const MiniChart: React.FC<MiniChartProps> = ({
           </View>
         ))}
       </View>
-    </Card>
+    </View>
   );
 };
 

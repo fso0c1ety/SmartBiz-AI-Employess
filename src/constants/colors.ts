@@ -1,6 +1,8 @@
 export const Colors = {
   light: {
     primary: '#2D6AFF',
+    secondary: '#8B5CF6',
+    accent: '#F59E0B',
     background: '#FFFFFF',
     surface: '#F8F9FA',
     card: '#FFFFFF',
@@ -9,11 +11,14 @@ export const Colors = {
     border: '#E5E7EB',
     error: '#EF4444',
     success: '#10B981',
+    successLight: '#D1FAE5',
     warning: '#F59E0B',
     shadow: 'rgba(0, 0, 0, 0.1)',
   },
   dark: {
     primary: '#2D6AFF',
+    secondary: '#8B5CF6',
+    accent: '#F59E0B',
     background: '#0F1419',
     surface: '#1A1F26',
     card: '#252D38',
@@ -22,6 +27,7 @@ export const Colors = {
     border: '#374151',
     error: '#F87171',
     success: '#34D399',
+    successLight: '#065F46',
     warning: '#FBBF24',
     shadow: 'rgba(0, 0, 0, 0.3)',
   },

@@ -1,6 +1,8 @@
 export { Button } from './Button';
 export { Input } from './Input';
 export { Card } from './Card';
+export { Header } from './Header';
+export { FloatingActionButton } from './FloatingActionButton';
 export { ModalComponent } from './Modal';
 export { ToastContainer } from './Toast';
 export { Skeleton, CardSkeleton } from './Skeleton';

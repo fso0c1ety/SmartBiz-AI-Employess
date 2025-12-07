@@ -3,13 +3,13 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useAuthStore } from '../store/useAuthStore';
 import { RootStackParamList } from './types';
+import { MainTabNavigator } from './MainTabNavigator';
 
 // Screens
 import { WelcomeScreen } from '../screens/WelcomeScreen';
 import { LoginScreen } from '../screens/LoginScreen';
 import { RegisterScreen } from '../screens/RegisterScreen';
 import { ForgotPasswordScreen } from '../screens/ForgotPasswordScreen';
-import { HomeScreen } from '../screens/HomeScreen';
 import { CreateAgentScreen } from '../screens/CreateAgentScreen';
 import { AgentWorkspaceScreen } from '../screens/AgentWorkspaceScreen';
 import { ContentGeneratorScreen } from '../screens/ContentGeneratorScreen';
@@ -42,11 +42,29 @@ export const AppNavigator = () => {
           </>
         ) : (
           <>
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="CreateAgent" component={CreateAgentScreen} />
-            <Stack.Screen name="AgentWorkspace" component={AgentWorkspaceScreen} />
-            <Stack.Screen name="ContentGenerator" component={ContentGeneratorScreen} />
-            <Stack.Screen name="Settings" component={SettingsScreen} />
+            <Stack.Screen name="MainTabs" component={MainTabNavigator} />
+            <Stack.Screen 
+              name="CreateAgent" 
+              component={CreateAgentScreen}
+              options={{
+                presentation: 'modal',
+              }}
+            />
+            <Stack.Screen 
+              name="AgentWorkspace" 
+              component={AgentWorkspaceScreen}
+            />
+            <Stack.Screen 
+              name="ContentGenerator" 
+              component={ContentGeneratorScreen}
+              options={{
+                presentation: 'modal',
+              }}
+            />
+            <Stack.Screen 
+              name="Settings" 
+              component={SettingsScreen}
+            />
           </>
         )}
       </Stack.Navigator>

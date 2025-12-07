@@ -3,15 +3,17 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   FlatList,
   TouchableOpacity,
   RefreshControl,
   Animated,
   ScrollView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Card } from '../components/Card';
+import { Header } from '../components/Header';
+import { FloatingActionButton } from '../components/FloatingActionButton';
 import { GradientCard } from '../components/GradientCard';
 import { StatCard } from '../components/StatCard';
 import { SearchBar } from '../components/SearchBar';
@@ -22,6 +24,8 @@ import { Colors } from '../constants/colors';
 import { BorderRadius, FontSize, FontWeight, Spacing } from '../constants/spacing';
 import { useThemeStore } from '../store/useThemeStore';
 import { useAgentStore, AIAgent } from '../store/useAgentStore';
+import { useAuthStore } from '../store/useAuthStore';
+import { useApi } from '../hooks/useApi';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 type HomeScreenProps = {
@@ -31,7 +35,9 @@ type HomeScreenProps = {
 export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const { colorScheme } = useThemeStore();
   const colors = Colors[colorScheme];
-  const { agents, selectAgent } = useAgentStore();
+  const { agents, selectAgent, setAgents } = useAgentStore();
+  const { isAuthenticated } = useAuthStore();
+  const { getAllBusinesses } = useApi();
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
@@ -45,9 +51,45 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     }).start();
   }, []);
 
+  // Load user's agents when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadAgents();
+    }
+  }, [isAuthenticated]);
+
+  const loadAgents = async () => {
+    try {
+      setIsLoading(true);
+      const businesses = await getAllBusinesses();
+      
+      // Transform businesses to agents format
+      const loadedAgents: AIAgent[] = businesses.map((business: any) => ({
+        id: business.agents?.[0]?.id || business.id,
+        agentName: business.agents?.[0]?.agentName || 'AI Assistant',
+        businessName: business.name,
+        industry: business.industry || '',
+        description: business.description || '',
+        targetAudience: business.targetAudience || '',
+        brandTone: business.brandTone || '',
+        socialLinks: business.socialLinks || {},
+        logo: business.logoUrl,
+        brandColors: business.brandColors || { primary: '#6366F1', secondary: '#8B5CF6' },
+        goals: business.goals || [],
+        role: business.agents?.[0]?.role || 'AI Marketing Manager',
+        createdAt: new Date(business.createdAt),
+      }));
+      
+      setAgents(loadedAgents);
+    } catch (error) {
+      console.error('Failed to load agents:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleRefresh = () => {
-    setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 1000);
+    loadAgents();
   };
 
   const handleAgentPress = (agent: AIAgent) => {
@@ -56,6 +98,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   };
 
   const filteredAgents = agents.filter((agent) =>
+    agent.agentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     agent.businessName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     agent.industry.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -71,7 +114,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     >
       <Card style={[styles.agentCard, viewMode === 'grid' && styles.gridCard]}>
         <View style={styles.cardHeader}>
-          <AgentAvatar businessName={item.businessName} logo={item.logo} size={viewMode === 'grid' ? 40 : 50} />
+          <AgentAvatar businessName={item.agentName} logo={item.logo} size={viewMode === 'grid' ? 40 : 50} />
           <View style={styles.statusDot}>
             <View style={[styles.dotInner, { backgroundColor: '#10B981' }]} />
           </View>
@@ -79,12 +122,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
         <View style={styles.agentInfo}>
           <Text style={[styles.businessName, { color: colors.text }]} numberOfLines={1}>
-            {item.businessName}
+            {item.agentName}
           </Text>
           <View style={styles.infoRow}>
-            <Badge text={item.industry} variant="default" />
             <Text style={[styles.role, { color: colors.textSecondary }]} numberOfLines={1}>
-              • {item.role}
+              {item.businessName} • {item.role}
             </Text>
           </View>
         </View>
@@ -134,25 +176,16 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>
-            Dashboard
-          </Text>
-          <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-            Welcome back! 👋
-          </Text>
-        </View>
-        <TouchableOpacity
-          style={[styles.settingsButton, { backgroundColor: colors.surface }]}
-          onPress={() => navigation.navigate('Settings')}
-        >
-          <Ionicons name="settings-outline" size={24} color={colors.text} />
-        </TouchableOpacity>
-      </View>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+      {/* Header Component */}
+      <Header
+        title="My AI Employees"
+        subtitle={`${activeAgents} active agents`}
+        showNotification={false}
+        showSearch={false}
+      />
 
+      <View style={styles.content}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Stats Section */}
         {agents.length > 0 && (
@@ -242,16 +275,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           scrollEnabled={false}
         />
       </ScrollView>
+      </View>
 
-      {/* FAB */}
+      {/* Floating Action Button */}
       {agents.length > 0 && (
-        <TouchableOpacity
-          style={[styles.fab, { backgroundColor: colors.primary }]}
+        <FloatingActionButton
           onPress={() => navigation.navigate('CreateAgent')}
-          activeOpacity={0.8}
-        >
-          <Ionicons name="add" size={28} color="#FFFFFF" />
-        </TouchableOpacity>
+          icon="add"
+        />
       )}
     </SafeAreaView>
   );
