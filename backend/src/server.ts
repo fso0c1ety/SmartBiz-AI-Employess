@@ -17,7 +17,7 @@ dotenv.config({ path: envPath });
 console.log('🤖 AI provider: DeepSeek only');
 
 const app: Application = express();
-const PORT = process.env.PORT || 5000;
+const PORT = parseInt(process.env.PORT || '5000', 10);
 
 // Middleware
 app.use(cors({
