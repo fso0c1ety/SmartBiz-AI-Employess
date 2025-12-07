@@ -1,9 +1,11 @@
 import axios, { AxiosInstance } from 'axios';
+import Constants from 'expo-constants';
 
 // API URL Configuration
-// Expo exposes env vars at runtime only when prefixed with EXPO_PUBLIC_
-// We fall back to REACT_APP_API_URL for local dev scripts, then to LAN IP
+// Primary source: expo-config extras (bundled at build time)
+// Fallbacks: runtime env vars, then LAN IP for local dev
 const API_URL =
+  Constants.expoConfig?.extra?.apiUrl ||
   process.env.EXPO_PUBLIC_API_URL ||
   process.env.REACT_APP_API_URL ||
   'http://192.168.0.27:5001/api';
