@@ -14,12 +14,20 @@
    - Search for and select `SmartBiz-AI-Employees`
    - Click "Deploy Now"
 
-3. **Wait for Auto-Detection**
-   - Railway will auto-detect the backend
-   - Select the `backend` folder as the root
-   - Click "Deploy"
+3. **Configure Root Directory**
+   - Railway will ask "Which service would you like to deploy?"
+   - Since this is a monorepo, you need to manually set the root
+   - In your Railway dashboard:
+     - Go to Settings
+     - Set "Root Directory" to: `backend`
+   - Click Save
 
-4. **Add Environment Variables**
+4. **Wait for Auto-Detection**
+   - Railway will detect the Node.js backend
+   - It will auto-detect the Dockerfile in the backend folder
+   - Wait for the build to complete (~3-5 minutes)
+
+5. **Add Environment Variables**
    - Once deployed, click on the "backend" service
    - Go to "Variables" tab
    - Add these variables:
@@ -30,9 +38,10 @@
      DEEPSEEK_API_URL = https://api.deepseek.com/v1/chat/completions
      NODE_ENV = production
      ALLOWED_ORIGINS = *
+     PORT = 5001
      ```
 
-5. **Get Your Backend URL**
+6. **Get Your Backend URL**
    - In Railway, your backend service shows a URL like:
    - `https://smartbiz-backend-prod.railway.app` ← **Copy this!**
 
