@@ -25,8 +25,8 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install production dependencies only
-RUN npm ci --omit=dev
+# Install dependencies (include Prisma for generate/migrate)
+RUN npm ci
 
 # Copy built application
 COPY --from=builder /app/dist ./dist
