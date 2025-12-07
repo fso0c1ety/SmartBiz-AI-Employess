@@ -53,14 +53,16 @@
    - Open `.env` file in your project root
    - Replace the API URL with your Railway URL:
      ```
+     EXPO_PUBLIC_API_URL=https://smartbiz-backend-prod.railway.app/api
      REACT_APP_API_URL=https://smartbiz-backend-prod.railway.app/api
      ```
 
 2. **Add GitHub Secret (for APK builds)**
    - Go to your GitHub repo → Settings → Secrets and variables → Actions
    - Click "New repository secret"
-   - Name: `REACT_APP_API_URL`
+   - Name: `EXPO_PUBLIC_API_URL`
    - Value: `https://smartbiz-backend-prod.railway.app/api` ← Your Railway URL
+   - (Optional fallback) Add `REACT_APP_API_URL` with the same value
    - Click "Add secret"
 
 ---

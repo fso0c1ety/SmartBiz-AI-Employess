@@ -1,10 +1,12 @@
 import axios, { AxiosInstance } from 'axios';
 
 // API URL Configuration
-// For production: Set REACT_APP_API_URL environment variable
-// For development: Falls back to local machine IP
-// For mobile: Use your machine IP instead of localhost
-const API_URL = process.env.REACT_APP_API_URL || 'http://192.168.0.27:5001/api';
+// Expo exposes env vars at runtime only when prefixed with EXPO_PUBLIC_
+// We fall back to REACT_APP_API_URL for local dev scripts, then to LAN IP
+const API_URL =
+  process.env.EXPO_PUBLIC_API_URL ||
+  process.env.REACT_APP_API_URL ||
+  'http://192.168.0.27:5001/api';
 
 interface ApiResponse<T> {
   data?: T;

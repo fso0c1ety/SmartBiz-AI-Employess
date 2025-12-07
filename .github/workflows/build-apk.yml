@@ -43,7 +43,8 @@ jobs:
         run: eas build --platform android --profile preview --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL || 'http://192.168.0.27:5001/api' }}
+          EXPO_PUBLIC_API_URL: ${{ secrets.EXPO_PUBLIC_API_URL || secrets.REACT_APP_API_URL || 'http://192.168.0.27:5001/api' }}
+          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL || secrets.EXPO_PUBLIC_API_URL || 'http://192.168.0.27:5001/api' }}
 
       - name: 📥 Download APK from EAS
         run: |
