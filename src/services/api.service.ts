@@ -34,18 +34,25 @@ class ApiService {
         config.headers.Authorization = `Bearer ${this.token}`;
       }
       console.log('📤 API Request:', config.method?.toUpperCase(), config.url);
+      console.log('🌐 Base URL:', this.api.defaults.baseURL);
+      console.log('🔗 Full URL:', `${this.api.defaults.baseURL}${config.url}`);
       return config;
     });
 
     // Add response interceptor for error handling
     this.api.interceptors.response.use(
-      (response) => response,
+      (response) => {
+        console.log('✅ API Success:', response.config.url, 'Status:', response.status);
+        return response;
+      },
       (error) => {
         console.log('🔴 API Error:', {
           url: error.config?.url,
           status: error.response?.status,
+          statusText: error.response?.statusText,
           message: error.response?.data?.error || error.message,
           data: error.response?.data,
+          fullError: error.toString(),
         });
         
         return Promise.reject(error);
@@ -71,11 +78,18 @@ class ApiService {
   }
 
   async login(email: string, password: string) {
-    const response = await this.api.post('/auth/login', { email, password });
-    if (response.data.token) {
-      this.setToken(response.data.token);
+    try {
+      console.log('🔐 Attempting login with:', email);
+      const response = await this.api.post('/auth/login', { email, password });
+      console.log('✅ Login response:', response.data);
+      if (response.data.token) {
+        this.setToken(response.data.token);
+      }
+      return response.data;
+    } catch (error: any) {
+      console.log('❌ Login failed:', error.response?.data || error.message);
+      throw error;
     }
-    return response.data;
   }
 
   async getCurrentUser() {
