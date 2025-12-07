@@ -51,27 +51,36 @@ app.use(errorHandler);
 const server = app.listen(PORT, '0.0.0.0', async () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+  console.log(`🔗 Health check: http://0.0.0.0:${PORT}/health`);
   
-  // Test database connection
+  // Test database connection (non-blocking)
   try {
     await prisma.$connect();
     console.log('✅ Database connection successful');
   } catch (error) {
     console.error('❌ Database connection failed:', error);
+    console.error('⚠️ Server will continue running but database operations will fail');
+  }
+});
+
+// Handle server errors
+server.on('error', (error: any) => {
+  console.error('❌ Server error:', error);
+  if (error.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use`);
+    process.exit(1);
   }
 });
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error) => {
   console.error('❌ Uncaught Exception:', error);
-  process.exit(1);
+  console.error('Stack:', error.stack);
 });
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (reason, promise) => {
   console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
-  process.exit(1);
 });
 
 export default app;
