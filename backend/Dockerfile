@@ -4,7 +4,7 @@ FROM node:18-alpine as builder
 WORKDIR /app
 
 # Ensure OpenSSL available for Prisma engines
-RUN apk add --no-cache openssl1.1-compat
+RUN apk add --no-cache openssl
 
 # Hint Prisma to use musl binary
 ENV PRISMA_CLI_BINARY_TARGETS=linux-musl
@@ -29,7 +29,7 @@ FROM node:18-alpine
 WORKDIR /app
 
 # Ensure OpenSSL available for Prisma engines
-RUN apk add --no-cache openssl1.1-compat
+RUN apk add --no-cache openssl
 
 # Hint Prisma to use musl binary
 ENV PRISMA_CLI_BINARY_TARGETS=linux-musl
