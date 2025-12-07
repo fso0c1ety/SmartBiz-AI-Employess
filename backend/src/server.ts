@@ -8,6 +8,7 @@ import agentRoutes from './routes/agent.routes';
 import chatRoutes from './routes/chat.routes';
 import contentRoutes from './routes/content.routes';
 import { errorHandler } from './middleware/error.middleware';
+import prisma from './config/database';
 
 // Load environment variables from backend/.env explicitly
 const envPath = path.resolve(__dirname, '../.env');
@@ -47,10 +48,18 @@ app.use((req, res) => {
 app.use(errorHandler);
 
 // Start server
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, async () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+  
+  // Test database connection
+  try {
+    await prisma.$connect();
+    console.log('✅ Database connection successful');
+  } catch (error) {
+    console.error('❌ Database connection failed:', error);
+  }
 });
 
 // Handle uncaught exceptions
