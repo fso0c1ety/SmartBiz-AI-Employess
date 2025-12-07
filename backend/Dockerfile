@@ -49,9 +49,8 @@ COPY --from=builder /app/dist ./dist
 # Copy Prisma schema from builder stage
 COPY --from=builder /app/prisma ./prisma
 
-# Copy node_modules with generated Prisma client from builder
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+# Copy ALL node_modules from builder (includes generated Prisma engines)
+COPY --from=builder /app/node_modules ./node_modules
 
 # Expose port
 EXPOSE 5001
