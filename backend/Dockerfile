@@ -31,8 +31,8 @@ RUN npm ci --omit=dev
 # Copy built application
 COPY --from=builder /app/dist ./dist
 
-# Copy Prisma schema
-COPY prisma ./prisma
+# Copy Prisma schema from builder stage
+COPY --from=builder /app/prisma ./prisma
 
 # Generate Prisma client
 RUN npx prisma generate
