@@ -1,13 +1,10 @@
 # Build stage
-FROM node:18-alpine as builder
+FROM node:18-slim as builder
 
 WORKDIR /app
 
-# Ensure OpenSSL available for Prisma engines
-RUN apk add --no-cache openssl
-
-# Hint Prisma to use musl binary
-ENV PRISMA_CLI_BINARY_TARGETS=linux-musl
+# Install OpenSSL and other dependencies for Prisma
+RUN apt-get update -y && apt-get install -y openssl
 
 # Copy package files
 COPY backend/package*.json ./
@@ -27,21 +24,15 @@ RUN npx prisma generate
 RUN npm run build
 
 # Production stage
-FROM node:18-alpine
+FROM node:18-slim
 
 WORKDIR /app
 
-# Ensure OpenSSL available for Prisma engines
-RUN apk add --no-cache openssl
-
-# Hint Prisma to use musl binary
-ENV PRISMA_CLI_BINARY_TARGETS=linux-musl
+# Install OpenSSL for Prisma runtime
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
 # Copy package files
 COPY backend/package*.json ./
-
-# Install dependencies (include Prisma for generate/migrate)
-RUN npm ci
 
 # Copy built application
 COPY --from=builder /app/dist ./dist
